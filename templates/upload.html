@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>لوحة تحليل Excel</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f7f9fc;
+            margin: 0;
+            color: #1f2937;
+        }
+        .header {
+            display: flex;
+            justify-content: flex-start;
+            padding: 16px 24px;
+            background: #ffffff;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .logo {
+            height: 72px;
+            object-fit: contain;
+        }
+        .container {
+            max-width: 700px;
+            margin: 36px auto;
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+        }
+        h1 {
+            margin-top: 0;
+            font-size: 26px;
+        }
+        .field {
+            margin: 20px 0;
+        }
+        input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            background: #fff;
+        }
+        button {
+            background: #0f4c81;
+            border: none;
+            color: white;
+            padding: 12px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .error {
+            margin-top: 8px;
+            color: #b91c1c;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <img class="logo" alt="" hidden>
+    </header>
+
+    <main class="container">
+        <h1>رفع ملف Excel</h1>
+        <form method="post" enctype="multipart/form-data">
+            <div class="field">
+                <input type="file" name="excel_file" accept=".xlsx,.xls" required>
+            </div>
+            <button type="submit">ابدأ التحليل</button>
+            {% if error %}
+                <p class="error">{{ error }}</p>
+            {% endif %}
+        </form>
+    </main>
+</body>
+</html>

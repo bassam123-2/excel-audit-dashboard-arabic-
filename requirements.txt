@@ -1,0 +1,5 @@
+flask
+pandas
+openpyxl
+python-pptx>=1.0.0
+pyinstaller>=6.0
