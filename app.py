@@ -77,8 +77,9 @@ def _brand_logo_search_roots() -> list[Path]:
     return roots
 
 
-def _pick_brand_logo_code(subsidiary_values: list[str], holding_values: list[str]) -> str | None:
-    """Case-sensitive brand codes; subsidiary filter takes precedence over holding."""
+def _pick_brand_logo_code(subsidiary_values: list[str], holding_values: list[str] | None = None) -> str | None:
+    """Case-sensitive brand codes; الشركة التابعة then الشركة القابضة."""
+    holding_values = holding_values or []
     for values in (subsidiary_values, holding_values):
         for raw in values:
             code = str(raw).strip()
@@ -241,29 +242,6 @@ def _normalize_value(value: object) -> str:
         return BLANK_LABEL
     text = str(value).strip()
     return text if text else BLANK_LABEL
-
-
-def _normalize_year_value(value: object) -> str:
-    if pd.isna(value):
-        return BLANK_LABEL
-
-    # If the year column contains a real date, use its year.
-    if isinstance(value, pd.Timestamp):
-        return str(int(value.year))
-
-    text = str(value).strip()
-    if not text:
-        return BLANK_LABEL
-
-    # Handle numeric forms like 2026 or 2026.0 stored in Excel.
-    try:
-        number = float(text)
-        if number.is_integer():
-            return str(int(number))
-    except ValueError:
-        pass
-
-    return text
 
 
 def _extract_valid_year(value: object) -> str | None:
@@ -1248,35 +1226,6 @@ def _pptx_set_rtl_paragraph(paragraph, *, bold: bool = False, size_pt: int = 12,
         run.font.color.rgb = color
 
 
-def _pptx_fill_cell(cell, text: str, *, header: bool = False, value: bool = False) -> None:
-    from pptx.enum.text import MSO_ANCHOR, PP_ALIGN
-    from pptx.util import Pt
-
-    cell.text = str(text or "—")
-    cell.vertical_anchor = MSO_ANCHOR.MIDDLE
-    tf = cell.text_frame
-    tf.word_wrap = True
-    for p in tf.paragraphs:
-        p.alignment = PP_ALIGN.RIGHT
-        for run in p.runs:
-            run.font.size = Pt(11 if value else 12)
-            run.font.bold = header or (not value)
-            if header:
-                run.font.color.rgb = _pptx_rgb("#ffffff")
-            elif value:
-                run.font.color.rgb = _pptx_rgb("#111827")
-            else:
-                run.font.color.rgb = _pptx_rgb("#14532d")
-    fill = cell.fill
-    fill.solid()
-    if header:
-        fill.fore_color.rgb = _pptx_rgb("#14532d")
-    elif value:
-        fill.fore_color.rgb = _pptx_rgb("#ffffff")
-    else:
-        fill.fore_color.rgb = _pptx_rgb("#ecfdf5")
-
-
 def _pptx_export_fields(fields: list[dict[str, str]]) -> list[dict[str, str]]:
     """Fields for PPT export: exclude email columns."""
     out: list[dict[str, str]] = []
@@ -1660,15 +1609,17 @@ def _build_group_data(df: pd.DataFrame, key: str) -> list[dict[str, int | str]]:
 
 @app.route("/api/brand-logo")
 def brand_logo() -> object:
-    code = _pick_brand_logo_code(
-        request.args.getlist("subsidiary_company"),
-        request.args.getlist("holding_company"),
-    )
+    code = request.args.get("code", "").strip()
+    if code not in BRAND_LOGO_CODES:
+        code = _pick_brand_logo_code(
+            request.args.getlist("subsidiary_company"),
+            request.args.getlist("holding_company"),
+        ) or ""
     if not code:
-        return "", 404
+        return "", 204
     path = _brand_logo_path(code)
     if path is None:
-        return "", 404
+        return "", 204
     return send_file(path, mimetype=_brand_logo_mime(path))
 
 
@@ -2048,21 +1999,6 @@ def audit_plan_panel() -> object:
         )
 
     return jsonify({"total_rows": int(len(work)), "columns": columns_out})
-
-
-def _logo_data_url() -> str:
-    if LOGO_PATH is None or not LOGO_PATH.is_file():
-        return ""
-    ext = LOGO_PATH.suffix.lower()
-    mime = {
-        ".png": "image/png",
-        ".jpg": "image/jpeg",
-        ".jpeg": "image/jpeg",
-        ".gif": "image/gif",
-        ".webp": "image/webp",
-    }.get(ext, "image/png")
-    b64 = base64.standard_b64encode(LOGO_PATH.read_bytes()).decode("ascii")
-    return f"data:{mime};base64,{b64}"
 
 
 def _legal_detail_payload_for_match(df: pd.DataFrame, row: pd.Series) -> dict[str, object]:
