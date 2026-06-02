@@ -1,13 +1,8 @@
 """
-Excel Arabic Dashboard — desktop app (Flask server + browser).
+Excel Arabic Dashboard — desktop app (Django server + browser).
 
 Development:
     python excel_arabic_desktop.py
-
-Build .exe (from project root):
-    pip install -r requirements-build.txt
-    pyinstaller excel_arabic_dashboard.spec
-    → dist/excel_arabic_dashboard.exe
 """
 
 from __future__ import annotations
@@ -15,8 +10,6 @@ from __future__ import annotations
 import argparse
 import os
 import sys
-import threading
-import time
 import webbrowser
 
 
@@ -25,7 +18,7 @@ def _default_host() -> str:
 
 
 def main() -> None:
-    from app import DEFAULT_DASHBOARD_PORT, app as flask_app
+    default_port = int(os.environ.get("EXCEL_ARABIC_PORT", "8765"))
 
     parser = argparse.ArgumentParser(description="Excel Arabic compliance dashboard")
     parser.add_argument(
@@ -37,11 +30,11 @@ def main() -> None:
         "--port",
         type=int,
         default=None,
-        help=f"HTTP port (default: {DEFAULT_DASHBOARD_PORT} or EXCEL_ARABIC_PORT)",
+        help=f"HTTP port (default: {default_port} or EXCEL_ARABIC_PORT)",
     )
     args = parser.parse_args()
 
-    port = args.port or DEFAULT_DASHBOARD_PORT
+    port = args.port or default_port
     host = _default_host()
     url = f"http://{host}:{port}/"
 
@@ -55,14 +48,14 @@ def main() -> None:
     print("Press Ctrl+C to stop.")
 
     if not args.no_browser:
+        webbrowser.open(url)
 
-        def _open_browser() -> None:
-            time.sleep(0.9)
-            webbrowser.open(url)
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "django_project.settings.local")
+    os.environ["EXCEL_ARABIC_PORT"] = str(port)
 
-        threading.Thread(target=_open_browser, daemon=True).start()
+    from web_app import main as run_web_app
 
-    flask_app.run(host=host, port=port, debug=False, use_reloader=False)
+    run_web_app(host=host, port=port)
 
 
 if __name__ == "__main__":

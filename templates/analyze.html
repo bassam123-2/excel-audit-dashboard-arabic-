@@ -1118,14 +1118,14 @@
         <img id="headerLogo" class="logo" alt=""{% if snapshot_logo_url %} src="{{ snapshot_logo_url }}"{% else %} hidden{% endif %}>
     </header>
 
-    <div class="page-top"{% if company_columns is not defined or (not company_columns.subsidiary and not company_columns.holding) %} hidden{% endif %}>
+    <div class="page-top"{% if not company_columns.subsidiary and not company_columns.holding %} hidden{% endif %}>
         <div class="page-top-inner">
-            <section id="subsidiary-company-section"{% if company_columns is not defined or (not company_columns.subsidiary and not company_columns.holding) %} hidden{% endif %}>
+            <section id="subsidiary-company-section"{% if not company_columns.subsidiary and not company_columns.holding %} hidden{% endif %}>
                 <div class="subsidiary-card">
                     <div class="subsidiary-card-header">
                         <div class="subsidiary-card-titles">
-                            <h2 id="companyBrandTitle" class="subsidiary-card-title">{% if company_columns is defined and company_columns.holding and not company_columns.subsidiary %}الشركة القابضة{% else %}الشركة التابعة{% endif %}</h2>
-                            <span id="companyBrandSubtitle" class="subsidiary-field-label">{% if company_columns is defined and company_columns.holding and not company_columns.subsidiary %}HOLDING{% else %}SUBCOMPANY{% endif %}</span>
+                            <h2 id="companyBrandTitle" class="subsidiary-card-title">{% if company_columns.holding and not company_columns.subsidiary %}الشركة القابضة{% else %}الشركة التابعة{% endif %}</h2>
+                            <span id="companyBrandSubtitle" class="subsidiary-field-label">{% if company_columns.holding and not company_columns.subsidiary %}HOLDING{% else %}SUBCOMPANY{% endif %}</span>
                         </div>
                         <div class="subsidiary-card-actions">
                             <button type="button" id="subsidiaryChangeBtn" class="subsidiary-change-btn">تغيير</button>
@@ -1780,7 +1780,7 @@
         const SUBSIDIARY_API_KEY = "الشركة التابعة";
         const HOLDING_API_KEY = "الشركة القابضة";
         const SUBSIDIARY_BRAND_ORDER = ["nat", "aum", "saco", "autostar", "btc"];
-        let companyBrandMode = "{% if company_columns is defined and company_columns.holding and not company_columns.subsidiary %}holding{% else %}subsidiary{% endif %}";
+        let companyBrandMode = "{% if company_columns.holding and not company_columns.subsidiary %}holding{% else %}subsidiary{% endif %}";
         let subsidiaryListBound = false;
 
         function companyBrandApiKey() {

@@ -67,6 +67,7 @@
     <main class="container">
         <h1>رفع ملف Excel</h1>
         <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
             <div class="field">
                 <input type="file" name="excel_file" accept=".xlsx,.xls" required>
             </div>

@@ -6,6 +6,8 @@ from PyInstaller.utils.hooks import collect_submodules
 
 flask_hidden = collect_submodules("flask")
 jinja_hidden = collect_submodules("jinja2")
+django_hidden = collect_submodules("django")
+rest_hidden = collect_submodules("rest_framework")
 
 a = Analysis(
     ["excel_arabic_desktop.py"],
@@ -14,13 +16,18 @@ a = Analysis(
     datas=[
         ("templates", "templates"),
         ("assets", "assets"),
+        ("django_project", "django_project"),
+        ("apps", "apps"),
     ],
     hiddenimports=[
         *flask_hidden,
         *jinja_hidden,
+        *django_hidden,
+        *rest_hidden,
         "pandas",
         "openpyxl",
         "pptx",
+        "pymysql",
         "werkzeug",
         "werkzeug.middleware.proxy_fix",
         "email",
