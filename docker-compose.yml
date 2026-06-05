@@ -1,0 +1,39 @@
+# Shared MySQL for the team (one instance, many developers connect to it).
+#
+# Start on the host machine that everyone can reach (office server or your PC):
+#   docker compose up -d
+#
+# Then in each developer .env set:
+#   MYSQL_HOST=<that machine IP or hostname>
+#   MYSQL_PORT=3306
+#   MYSQL_DATABASE=excel_arabic
+#   MYSQL_USER=excel_user
+#   MYSQL_PASSWORD=<same as MYSQL_PASSWORD below>
+
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: excel_arabic_mysql
+    restart: unless-stopped
+    ports:
+      - "${MYSQL_PORT:-3306}:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpass}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-excel_arabic}
+      MYSQL_USER: ${MYSQL_USER:-excel_user}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-excel_pass}
+    volumes:
+      - excel_arabic_mysql_data:/var/lib/mysql
+      - ./scripts/mysql/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:-rootpass}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+
+volumes:
+  excel_arabic_mysql_data:

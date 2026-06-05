@@ -9,7 +9,7 @@ labels: bug
 
 - OS: <!-- e.g. Windows 11 -->
 - Python version: <!-- `python --version` or N/A for exe-only -->
-- Run mode: <!-- `python app.py` / `excel_arabic_desktop.py` / built `.exe` -->
+- Run mode: <!-- `python manage.py runserver` / `excel_arabic_desktop.py` / built `.exe` -->
 
 ## Steps to reproduce
 

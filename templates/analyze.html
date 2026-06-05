@@ -1143,6 +1143,11 @@
     </div>
 
     <main class="container">
+        {% if upload_row_count %}
+        <p class="hint" style="background:#ecfdf5;border:1px solid #16a34a;padding:10px;border-radius:8px;">
+            تم حفظ {{ upload_row_count }} صف في قاعدة البيانات من الملف: {{ upload_filename }}
+        </p>
+        {% endif %}
         <section class="top-charts">
             <div class="chart-card">
                 <h3 class="chart-title">الحالة</h3>

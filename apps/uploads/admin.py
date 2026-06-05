@@ -1,13 +1,21 @@
 from django.contrib import admin
 
-from .models import EmailLog, ExportLog, UploadSession
+from .models import ComplianceRecord, EmailLog, ExportLog, UploadSession
 
 
 @admin.register(UploadSession)
 class UploadSessionAdmin(admin.ModelAdmin):
-    list_display = ("id", "original_filename", "uploaded_at", "uploaded_by", "is_active")
+    list_display = ("id", "original_filename", "row_count", "uploaded_at", "uploaded_by", "is_active")
     search_fields = ("original_filename", "file_hash")
     list_filter = ("is_active", "uploaded_at")
+
+
+@admin.register(ComplianceRecord)
+class ComplianceRecordAdmin(admin.ModelAdmin):
+    list_display = ("excel_row", "status", "legal_text", "subsidiary_company", "upload_session")
+    search_fields = ("legal_text", "status", "email", "department")
+    list_filter = ("status", "compliance_status", "residual_risk")
+    raw_id_fields = ("upload_session",)
 
 
 @admin.register(ExportLog)

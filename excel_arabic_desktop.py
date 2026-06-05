@@ -53,9 +53,11 @@ def main() -> None:
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "django_project.settings.local")
     os.environ["EXCEL_ARABIC_PORT"] = str(port)
 
-    from web_app import main as run_web_app
+    from django.core.management import execute_from_command_line
 
-    run_web_app(host=host, port=port)
+    execute_from_command_line(
+        [sys.argv[0], "runserver", f"{host}:{port}", "--noreload"]
+    )
 
 
 if __name__ == "__main__":

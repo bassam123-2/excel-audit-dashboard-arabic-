@@ -69,6 +69,19 @@ TEMPLATES = [
 WSGI_APPLICATION = "django_project.wsgi.application"
 ASGI_APPLICATION = "django_project.asgi.application"
 
+def _mysql_options() -> dict:
+    options: dict = {
+        "charset": "utf8mb4",
+        "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
+    }
+    ssl_ca = os.environ.get("MYSQL_SSL_CA", "").strip()
+    if ssl_ca:
+        options["ssl"] = {"ca": ssl_ca}
+    elif os.environ.get("MYSQL_REQUIRE_SSL", "").strip().lower() in {"1", "true", "yes"}:
+        options["ssl"] = {}
+    return options
+
+
 if os.environ.get("DJANGO_USE_SQLITE", "0").strip() in {"1", "true", "True"}:
     DATABASES = {
         "default": {
@@ -77,6 +90,7 @@ if os.environ.get("DJANGO_USE_SQLITE", "0").strip() in {"1", "true", "True"}:
         }
     }
 else:
+    conn_max_age = int(os.environ.get("MYSQL_CONN_MAX_AGE", "60"))
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.mysql",
@@ -85,7 +99,8 @@ else:
             "PASSWORD": os.environ.get("MYSQL_PASSWORD", ""),
             "HOST": os.environ.get("MYSQL_HOST", "127.0.0.1"),
             "PORT": os.environ.get("MYSQL_PORT", "3306"),
-            "OPTIONS": {"charset": "utf8mb4"},
+            "OPTIONS": _mysql_options(),
+            "CONN_MAX_AGE": conn_max_age,
         }
     }
 

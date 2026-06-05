@@ -7,7 +7,7 @@ Thank you for improving the Excel Arabic Dashboard. This guide helps new develop
 1. **Python 3.10+** installed (`python --version`).
 2. Clone the repo and create a virtual environment (see [README.md](README.md)).
 3. Install dependencies: `pip install -r requirements.txt`.
-4. Copy `.env.example` to `.env` and set MySQL credentials.
+4. Copy `.env.example` to `.env` and set **shared** MySQL credentials from your team lead (`MYSQL_HOST`, user, password). See [docs/SHARED_DATABASE.md](docs/SHARED_DATABASE.md).
 5. Obtain a **sample compliance Excel file** from your team lead — real registers often contain confidential data and are **not** stored in Git.
 
 ## Running locally

@@ -18,6 +18,6 @@
 
 ## Checklist
 
-- [ ] Tested with `python app.py` and a valid Excel file
+- [ ] Tested with `python manage.py runserver` and a valid Excel file
 - [ ] No secrets, `.env`, or real `.xlsx` data committed
 - [ ] Updated docs if behavior or env vars changed
